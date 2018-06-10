@@ -1,0 +1,44 @@
+#+OPTIONS: toc:nil num:nil email:t timestamp:nil
+#+REVEAL_ROOT: https://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_PLUGINS: (highlight)
+#+with-email: t
+#+TITLE: lsp-mode: 30+ languages in one minor mode
+#+AUTHOR: George Pittarelli
+#+EMAIL: g@gjp.cc
+
+* Follow along
+
+These slides are generated from an org-mode with executable code
+blocks to demo lsp-mode
+
+Available at https://gjp.cc/lsp
+
+#+BEGIN_SRC sh
+wget gjp.cc/lsp-mode.org
+# or
+git clone gjp.cc/lsp
+# or
+git clone github.com/gpittarelli/lsp-presentation
+#+END_SRC
+
+* The Language Server Protocol (LSP)
+
+LSP is a standard protocol to provide IDE-style features for any
+programming language, so that all IDEs/text-editors can share the work
+of providing per-language integrations.
+
+https://langserver.org/
+
+* lsp-mode
+
+Minor mode implementing the LSP protocol and hooks into standard Emacs APIs
+
+Available on [[https://melpa.org/#/][MELPA]]:
+
+#+BEGIN_SRC elisp
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives
+  '("melpa" . "https://melpa.org/packages/") t)
+(package-install 'lsp-mode)
+#+END_SRC
