@@ -1,7 +1,8 @@
 #+OPTIONS: toc:nil num:nil email:t timestamp:nil
+#+OPTIONS: reveal_history:t reveal_control:nil
 #+REVEAL_ROOT: https://cdn.jsdelivr.net/reveal.js/3.0.0/
-#+REVEAL_PLUGINS: (highlight)
-#+with-email: t
+#+REVEAL_PLUGINS: (highlight note)
+#+REVEAL_OPTIONS: history:t
 #+TITLE: lsp-mode: 30+ languages in one minor mode
 #+AUTHOR: George Pittarelli
 #+EMAIL: g@gjp.cc
@@ -21,17 +22,99 @@ git clone gjp.cc/lsp
 git clone github.com/gpittarelli/lsp-presentation
 #+END_SRC
 
-* The Language Server Protocol (LSP)
+* What do we want
 
-LSP is a standard protocol to provide IDE-style features for any
-programming language, so that all IDEs/text-editors can share the work
-of providing per-language integrations.
+IDE features:
+- auto-complete
+- documentation on hover
+- jump to definition
+- refactoring menu
+- error detection
+- project-wide diagnostics
 
-https://langserver.org/
+#+BEGIN_NOTES
+- intro the features we want
+- not exhaustive
+- syntax coloring, REPLs
+- ask audience if they're curious about anything not on the list
+#+END_NOTES
+
+* Implement it per-language
+
+- R: ESS
+- Clojure: CIDER
+- Typescript: tsserver and tide-mode
+- C#: omnisharp and omnisharp-emacs
+
+#+BEGIN_NOTES
+- currently, features are best integrated through language-specific
+  tools
+- ESS, CIDER: build it custom for emacs
+- tsserver, omnisharp: servers with emacs implementations; but not
+  reusable protocols
+#+END_NOTES
+
+* Attempts to generalize
+
+- textmate files: syntax highlighting
+- [[https://github.com/Valloric/ycmd][ycmd]] YouCompleteMe
+
+#+BEGIN_NOTES
+- Technical choice <<< community support
+- LSP has, by far: more languages, supporting orgs, etc.
+#+END_NOTES
+
+* LSP: Language Server Protocol
+
+Implement language diagnostics once, as a server
+
+All editors can share the smarts
+
+file:images/lsp-grid.png
+
+Overview: https://langserver.org/
+
+Spec: https://microsoft.github.io/language-server-protocol/specification
+
+#+BEGIN_NOTES
+Introduce LSP
+
+- By microsoft,
+- nice that good language tools are written by a single team, and/or
+  by motivated orgs (microsoft, llvm, sourgegraph, omnisharp, etc.)
+- For M languages and N editors:
+- MxN -> M+N
+- RMS wants it
+  https://lists.gnu.org/archive/html/emacs-devel/2017-04/msg00798.html
+#+END_NOTES
+
+* LSP: Overview
+
+- RPC: JSON with headers
+- single connection (stdio or tcp)
+- growing fairly fast:
+  https://github.com/Microsoft/language-server-protocol
+
+#+BEGIN_NOTES
+- New sorta-like-json-over-http proto
+- Already on v3.8.0; small changes every few months
+#+END_NOTES
+
+* LSP: Overview (2)
+
+- Synchronize file/project state
+- Query for specific information on hover/completion
+
+#+BEGIN_NOTES
+- New sorta-like-json-over-http proto
+- Already on v3.8.0; small changes every few months
+#+END_NOTES
 
 * lsp-mode
 
-Minor mode implementing the LSP protocol and hooks into standard Emacs APIs
+Minor mode:
+ - implements LSP
+ - hooks into standard Emacs APIs
 
 Available on [[https://melpa.org/#/][MELPA]]:
 
@@ -42,3 +125,42 @@ Available on [[https://melpa.org/#/][MELPA]]:
   '("melpa" . "https://melpa.org/packages/") t)
 (package-install 'lsp-mode)
 #+END_SRC
+
+* How to define a client
+
+define macros
+
+lsp-css
+
+lsp-java
+
+#+BEGIN_SRC elisp
+
+#+END_SRC
+
+* Main features lsp-mode directly provides
+
+- imenu
+- xref
+- completion-at-point
+- eldoc
+
+* lsp-ui
+
+- flycheck
+- pretty opinionated...
+
+* ide-mode
+
+* testing
+
+lsp-java cucumber tests :D
+emacs-lsp-acceptance-tests
+
+*
+
+lsp-mode, and the various language plugins
+
+* alternatives
+
+eglot,
