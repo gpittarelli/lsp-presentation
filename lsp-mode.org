@@ -1,7 +1,7 @@
 #+OPTIONS: toc:nil num:nil email:t timestamp:nil
 #+OPTIONS: reveal_history:t reveal_control:nil
 #+REVEAL_ROOT: https://cdn.jsdelivr.net/reveal.js/3.0.0/
-#+REVEAL_PLUGINS: (highlight note)
+#+REVEAL_PLUGINS: (highlight notes)
 #+REVEAL_OPTIONS: history:t
 #+TITLE: lsp-mode: 30+ languages in one minor mode
 #+AUTHOR: George Pittarelli
@@ -16,8 +16,6 @@ Available at https://gjp.cc/lsp
 
 #+BEGIN_SRC sh
 wget gjp.cc/lsp-mode.org
-# or
-git clone gjp.cc/lsp
 # or
 git clone github.com/gpittarelli/lsp-presentation
 #+END_SRC
@@ -43,20 +41,22 @@ IDE features:
 
 - R: ESS
 - Clojure: CIDER
+
 - Typescript: tsserver and tide-mode
 - C#: omnisharp and omnisharp-emacs
 
 #+BEGIN_NOTES
 - currently, features are best integrated through language-specific
   tools
-- ESS, CIDER: build it custom for emacs
-- tsserver, omnisharp: servers with emacs implementations; but not
-  reusable protocols
+- ESS, CIDER: build it custom for emacs; lots of highly specific code
+- tsserver, omnisharp: servers with emacs client implementations; but
+  not reusable protocols
 #+END_NOTES
 
 * Attempts to generalize
 
 - textmate files: syntax highlighting
+- tags files (etags, ctags); [[https://www.gnu.org/software/global/][GNU global]]
 - [[https://github.com/Valloric/ycmd][ycmd]] YouCompleteMe
 
 #+BEGIN_NOTES
@@ -126,41 +126,150 @@ Available on [[https://melpa.org/#/][MELPA]]:
 (package-install 'lsp-mode)
 #+END_SRC
 
+* lsp-mode provides
+
+- [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Imenu.html][imenu]]
+- [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html][xref]]
+- [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.html][completion-at-point]]
+- [[https://www.emacswiki.org/emacs/ElDoc][eldoc]]
+- flycheck, more fancy UI ([[https://github.com/emacs-lsp/lsp-ui][lsp-ui]])
+- company ([[https://github.com/tigersoldier/company-lsp][company-lsp]])
+
+#+BEGIN_NOTES
+- Emacs does actually have lots of builtin hooks to provide IDE-esque
+  features
+- Note: some of these require synchronous resolution... very troubling
+  for some of the language servers
+- Demo time
+  - lsp-ui
+  - company-lsp
+  - javascript, Rust, java, ruby (tcp), R, audience requests...
+  - small aside: lsp hover fn...
+- Lead to next slide: Note, nothing about how to actually start or
+  connect to the language server...
+#+END_NOTES
+
 * How to define a client
 
-define macros
-
-lsp-css
-
-lsp-java
-
 #+BEGIN_SRC elisp
-
+(lsp-define-stdio-client
+ lsp-css
+ "css"
+ lsp-css--get-root
+ '("css-languageserver" "--stdio"))
 #+END_SRC
 
-* Main features lsp-mode directly provides
+#+BEGIN_NOTES
+- need to configure how to setup each language
+- simple example: lsp-css
+- complex examples:
+  - haskell
+  - java (example of per-language LSP endpoints)
+- turns out, we need some language specific smarts anyways...
+#+END_NOTES
 
-- imenu
-- xref
-- completion-at-point
-- eldoc
+* How to define a client
 
-* lsp-ui
+#+BEGIN_SRC elisp
+(lsp-define-stdio-client
+ lsp-css
+ "css"
+ lsp-css--get-root
+ '("css-languageserver" "--stdio"))
+#+END_SRC
 
-- flycheck
-- pretty opinionated...
+#+BEGIN_NOTES
+- need to configure how to setup each language
+- creates a lsp-(name)-enable function which starts the
+- simple example: lsp-css
+- complex examples:
+  - haskell
+  - java (example of per-language LSP endpoints)
+- turns out, we need some language specific smarts anyways...
+#+END_NOTES
 
-* ide-mode
+* Example setup
 
-* testing
+#+BEGIN_SRC elisp
+(defun my-rust-mode-setup ()
+  (company-mode)
+  (lsp-rust-enable)
+  (eldoc-mode t)
+  (flycheck-mode)
+  (lsp-ui-mode))
+(add-hook 'rust-mode-hook #'my-rust-mode-setup)
+(add-to-list 'auto-mode-alist '("\\.rs" . rust-mode))
+#+END_SRC
 
-lsp-java cucumber tests :D
-emacs-lsp-acceptance-tests
+#+BEGIN_NOTES
+- this example is one of many from
+  https://github.com/gpittarelli/emacs-lsp-acceptance-testing/blob/master/tests/setup.el
+#+END_NOTES
 
-*
+* Testing
 
-lsp-mode, and the various language plugins
+- ert
+- [[https://github.com/emacs-lsp/lsp-java][lsp-java]]: cucumber tests
+- [[https://github.com/gpittarelli/emacs-lsp-acceptance-testing/][emacs-lsp-acceptance-tests]]
 
-* alternatives
+#+BEGIN_NOTES
+- LSP is a pretty complex ecosystem of clients and servers with
+  varying opionions on what exactly the spec entails; and all of them
+  are developing independently.
+- ert: mostly unit tests; buy also can easily do integration because
+  emacs is flexible like that
+- emacs-lsp-acceptance-tests: WIP; includes sample configs for most of
+  the languages for lsp mode and
+#+END_NOTES
 
-eglot,
+* Aside: protocol parsing in emacs
+
+- frankly, hacky (manual dechunking)
+- process filters and lots of manual parsing
+- alternative: just use buffers
+
+#+BEGIN_NOTES
+- I rewrote current LSP parsing loop from the previous code for perf:
+  - https://github.com/emacs-lsp/lsp-mode/pull/107
+  - https://github.com/emacs-lsp/lsp-mode/pull/108
+- need to be careful of any incremental copying; etc.: some servers
+  can send back multi-mb responses in some cases! (eg, completing in
+  the global scope in JS)
+  - (yes, completion does support chunked responses; not all language
+    servers support all the fine details of the protoocol)
+- handling multibyte characters/responses is surprisingly hard (or at
+  least, its hard to do while remaining efficient)
+- buffer downsides: grows big;
+#+END_NOTES
+
+* Future goal: autosetup
+
+Based on major mode and/or file extension, we should be able to automatically:
+- download the server
+- install the necessary lsp-plugins
+- provide good defaults
+
+#+BEGIN_NOTES
+- I sorta wanted to have this working in time for the talk... but
+  stuff happened
+- have a really good name for it
+#+END_NOTES
+
+* Alternatives
+
+Note there's a couple defunt "emacs-lsp", etc. packages on github from
+previous attempts by other people.
+
+eglot is the only reasonably working alternative I know of
+
+#+BEGIN_NOTES
+defunct examples:
+ - https://github.com/sourcegraph/emacs-lsp
+ -
+
+eglot: https://github.com/joaotavora/eglot
+ - more opinionated
+ - less extensible
+ - no separate packages (good for the supported ones; bad for the not supported ones)
+ - less bugfixes/community support; less
+#+END_NOTES
