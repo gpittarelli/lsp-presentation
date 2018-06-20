@@ -160,25 +160,8 @@ Available on [[https://melpa.org/#/][MELPA]]:
 #+END_SRC
 
 #+BEGIN_NOTES
-- need to configure how to setup each language
-- simple example: lsp-css
-- complex examples:
-  - haskell
-  - java (example of per-language LSP endpoints)
-- turns out, we need some language specific smarts anyways...
-#+END_NOTES
+Main aspects: stdio vs tcp, name, what to launch
 
-* How to define a client
-
-#+BEGIN_SRC elisp
-(lsp-define-stdio-client
- lsp-css
- "css"
- lsp-css--get-root
- '("css-languageserver" "--stdio"))
-#+END_SRC
-
-#+BEGIN_NOTES
 - need to configure how to setup each language
 - creates a lsp-(name)-enable function which starts the
 - simple example: lsp-css
