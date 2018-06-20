@@ -9,8 +9,8 @@
 
 * Follow along
 
-These slides are generated from an org-mode with executable code
-blocks to demo lsp-mode
+These slides are generated from an org file with some speaker notes
+and code blocks
 
 Available at https://gjp.cc/lsp
 
@@ -173,6 +173,25 @@ Available on [[https://melpa.org/#/][MELPA]]:
 Main aspects: stdio vs tcp, name, what to launch
 
 - need to configure how to setup each language
+- creates a lsp-(name)-enable function which starts the server and
+  enables lsp-mode (call this, NOT lsp-mode directly)
+- simple example: lsp-css
+- complex examples:
+  - haskell
+  - java (example of per-language LSP endpoints)
+- turns out, we need some language specific smarts anyways...
+#+END_NOTES
+
+* language packages
+
+#+BEGIN_SRC elisp
+(package-install 'lsp-css)
+#+END_SRC
+
+#+BEGIN_NOTES
+Main aspects: stdio vs tcp, name, what to launch
+
+- need to configure how to setup each language
 - creates a lsp-(name)-enable function which starts the
 - simple example: lsp-css
 - complex examples:
@@ -180,6 +199,7 @@ Main aspects: stdio vs tcp, name, what to launch
   - java (example of per-language LSP endpoints)
 - turns out, we need some language specific smarts anyways...
 #+END_NOTES
+
 
 * Example setup
 
@@ -253,7 +273,7 @@ Based on major mode and/or file extension, we should be able to automatically:
 Note there's a couple defunt "emacs-lsp", etc. packages on github from
 previous attempts by other people.
 
-eglot is the only reasonably working alternative I know of
+eglot is the only reasonably working alternative
 
 #+BEGIN_NOTES
 defunct examples:
