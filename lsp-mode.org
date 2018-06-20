@@ -104,6 +104,7 @@ Introduce LSP
 
 - Synchronize file/project state
 - Query for specific information on hover/completion
+- Send commands for refactors; get back text changes to apply
 
 #+BEGIN_NOTES
 - New sorta-like-json-over-http proto
@@ -113,8 +114,9 @@ Introduce LSP
 * lsp-mode
 
 Minor mode:
- - implements LSP
+ - implements an LSP client
  - hooks into standard Emacs APIs
+ - provides API for defining clients
 
 Available on [[https://melpa.org/#/][MELPA]]:
 
@@ -132,14 +134,22 @@ Available on [[https://melpa.org/#/][MELPA]]:
 - [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html][xref]]
 - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.html][completion-at-point]]
 - [[https://www.emacswiki.org/emacs/ElDoc][eldoc]]
-- flycheck, more fancy UI ([[https://github.com/emacs-lsp/lsp-ui][lsp-ui]])
+- flycheck, fancy UI ([[https://github.com/emacs-lsp/lsp-ui][lsp-ui]])
 - company ([[https://github.com/tigersoldier/company-lsp][company-lsp]])
 
 #+BEGIN_NOTES
+- xref:
+  - xref backends (return a symbol from hook function; and extend some
+    generic methods with cl-defmethod specialized on the symbol)
+- completion-at-point:
+  - completion-at-point-functions
+
 - Emacs does actually have lots of builtin hooks to provide IDE-esque
   features
 - Note: some of these require synchronous resolution... very troubling
   for some of the language servers
+  - eg completion-at-point is sync; company backends are not
+    (callback)
 - Demo time
   - lsp-ui
   - company-lsp
@@ -205,7 +215,7 @@ Main aspects: stdio vs tcp, name, what to launch
   the languages for lsp mode and
 #+END_NOTES
 
-* Aside: protocol parsing in emacs
+* Protocol parsing in emacs
 
 - frankly, hacky (manual dechunking)
 - process filters and lots of manual parsing
@@ -248,11 +258,11 @@ eglot is the only reasonably working alternative I know of
 #+BEGIN_NOTES
 defunct examples:
  - https://github.com/sourcegraph/emacs-lsp
- -
+ - ... i remembers there were others but can't find them
 
 eglot: https://github.com/joaotavora/eglot
- - more opinionated
- - less extensible
- - no separate packages (good for the supported ones; bad for the not supported ones)
- - less bugfixes/community support; less
+ - more opinionated (good...?); sorta like lsp-mode + lsp-ui + a few lsp-(language) clients
+ - less extensible (fewer defcustoms; client options are only the command to run)
+ - no separate packages (good imo)
+ - less bugfixes/community support
 #+END_NOTES
