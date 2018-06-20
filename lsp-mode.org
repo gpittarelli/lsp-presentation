@@ -79,9 +79,9 @@ Spec: https://microsoft.github.io/language-server-protocol/specification
 #+BEGIN_NOTES
 Introduce LSP
 
-- By microsoft,
+- By Microsoft,
 - nice that good language tools are written by a single team, and/or
-  by motivated orgs (microsoft, llvm, sourgegraph, omnisharp, etc.)
+  by motivated orgs (Microsoft, llvm, sourgegraph, omnisharp, etc.)
 - For M languages and N editors:
 - MxN -> M+N
 - RMS wants it
@@ -153,7 +153,7 @@ Available on [[https://melpa.org/#/][MELPA]]:
 - Demo time
   - lsp-ui
   - company-lsp
-  - javascript, Rust, java, ruby (tcp), R, audience requests...
+  - JavaScript, Rust, java, ruby (tcp), R, audience requests...
   - small aside: lsp hover fn...
 - Lead to next slide: Note, nothing about how to actually start or
   connect to the language server...
@@ -249,7 +249,7 @@ Main aspects: stdio vs tcp, name, what to launch
   can send back multi-mb responses in some cases! (eg, completing in
   the global scope in JS)
   - (yes, completion does support chunked responses; not all language
-    servers support all the fine details of the protoocol)
+    servers support all the fine details of the protocol)
 - handling multibyte characters/responses is surprisingly hard (or at
   least, its hard to do while remaining efficient)
 - buffer downsides: grows big;
@@ -270,7 +270,7 @@ Based on major mode and/or file extension, we should be able to automatically:
 
 * Alternatives
 
-Note there's a couple defunt "emacs-lsp", etc. packages on github from
+Note there's a couple defunct "emacs-lsp", etc. packages on GitHub from
 previous attempts by other people.
 
 eglot is the only reasonably working alternative
